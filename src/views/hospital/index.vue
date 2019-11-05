@@ -16,7 +16,7 @@
         </div>
         <van-divider/>
         <ul class="hospital-list">
-            <li v-for="item in 5" :key="item">
+            <li v-for="item in 5" :key="item" @click="$router.push('/hospital/detail')">
                 <div class="img-distance">
                     <img src="https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg">
                     <p>距离您8km</p>

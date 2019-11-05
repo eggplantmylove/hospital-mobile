@@ -52,5 +52,9 @@ export default new VueRouter({
                 }
             ]
         },
+        {
+            path: '/hospital/detail',
+            component: () => import('@/views/hospital/detail')
+        }
     ]
 })
