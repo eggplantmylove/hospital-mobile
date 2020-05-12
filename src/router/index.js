@@ -6,6 +6,10 @@ Vue.use(VueRouter);
 export default new VueRouter({
     routes: [
         {
+            path: '/demo',
+            component: () => import('@/views/demo')
+        },
+        {
             path: '/',
             component: () => import('@/views/bottomNav'),
             redirect: '/home',
@@ -16,7 +20,7 @@ export default new VueRouter({
                     meta: {
                         title: '首页',
                         icon: 'icon-shouye'
-                    } 
+                    }
                 },
                 {
                     path: '/record',
