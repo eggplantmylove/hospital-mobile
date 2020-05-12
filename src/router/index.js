@@ -16,7 +16,7 @@ export default new VueRouter({
                     meta: {
                         title: '首页',
                         icon: 'icon-shouye'
-                    }
+                    } 
                 },
                 {
                     path: '/record',
@@ -49,12 +49,37 @@ export default new VueRouter({
                         title: '我的',
                         icon: 'icon-wode'
                     }
-                }
+                },
+
             ]
         },
         {
             path: '/hospital/detail',
-            component: () => import('@/views/hospital/detail')
+            component: () => import('@/views/hospital/detail'),
+            children:[]
+        },
+        {
+            path: '/card-list',
+            component: () => import('@/views/my/card-list'),
+            meta: {
+                title: '就诊卡',
+                icon: 'icon-wode'
+            }
+        },
+        {
+            path: '/hospital/dept',
+            component: () => import('@/views/dept/index'),
+            children:[]
+        },
+        {
+            path: '/appointment/:id',
+            component: () => import('@/views/dept/page2'),
+            children:[]
+        },
+        {
+            path: '/detail-resource/:id',
+            component: () => import('@/views/dept/page1'),
+            children:[]
         }
     ]
 })

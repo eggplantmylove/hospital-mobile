@@ -1,7 +1,7 @@
 <template>
     <div>
         <van-grid :column-num="2" :center="false">
-            <van-grid-item v-for="(item, index) in topNav" :key="index">
+            <van-grid-item v-for="(item, index) in topNav" :key="index" :to="item.path" >
                 <div class="top-box">
                     <div class="round-box flex-center" :style="{background: item.color}">
                         <i class="iconfont" :class="item.icon"></i>
@@ -39,20 +39,20 @@
     export default {
         name: 'index',
         data() {
+            
             return {
+                // myNav:this.$router.options.routes.find(item => item.children.path === '/home').children,
                 // 顶部导航
                 topNav: [
-                    {title: '在线预约', content: '看病提前预约', icon: 'icon-yuyuexinxi', color: '#FA525A',},
-                    {title: '线上提问', content: '在线免费咨询', icon: 'icon-tiwen', color: '#FCBA00',},
-                    {title: '移动支付', content: '移动支付医疗费', icon: 'icon-zhifubao', color: '#4CBDFA',},
+                    {title: '在线预约', content: '看病提前预约', icon: 'icon-yuyuexinxi', color: '#FA525A',path:"appointment"},
+                    {title: '门诊缴费', content: '移动支付医疗费', icon: 'icon-zhifubao', color: '#4CBDFA',},
                     {title: '今日挂号', content: '解决排队烦恼', icon: 'icon-jia', color: '#55D323',},
-                    {title: '医保促销', content: '快速报销医疗费', icon: 'icon-baoxiao', color: '#6435FA',},
-                    {title: '快速购药', content: '买药快速方便', icon: 'icon-yaopin', color: '#20ABA9',},
+                    {title: '住院缴费', content: '快速报销医疗费', icon: 'icon-baoxiao', color: '#6435FA',}
                 ],
                 // 我的服务
                 myService: [
-                    { title: '预约体检', icon: 'icon-tijian', topColor: '#F20FE5', bottomColor: '#FB243A' },
-                    { title: '住院办理', icon: 'icon-zhuyuanjiancha', topColor: '#FFC454', bottomColor: '#FF6D21' },
+                    { title: '门诊费用', icon: 'icon-tijian', topColor: '#F20FE5', bottomColor: '#FB243A' },
+                    { title: '住院费用', icon: 'icon-zhuyuanjiancha', topColor: '#FFC454', bottomColor: '#FF6D21' },
                     { title: '专家门诊', icon: 'icon-menzhenfuwukaobei', topColor: '#A551FE', bottomColor: '#552FF9' },
                     { title: '家庭医生', icon: 'icon-jiatingyisheng', topColor: '#A551FE', bottomColor: '#532EF9' },
                     { title: '开药门诊', icon: 'icon-yao', topColor: '#FFC252', bottomColor: '#FF6E21' },

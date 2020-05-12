@@ -1,9 +1,10 @@
 <template>
     <div>
         <van-sticky>
-            <van-nav-bar style="background:#316DE0;" :border="false">
+            <van-nav-bar style="background:#316DE0;" :border="false" left-arrow @click-left="onClickLeft"> 
                 <h4 slot="title" style="color: #fff">个人中心</h4>
             </van-nav-bar>
+               
         </van-sticky>
         <div class="top">
             <div style="background: #316DE0;height: 130px"></div>
@@ -32,6 +33,53 @@
                 </ul>
             </div>
         </div>
+        <div>
+        <ul class="list">
+            <li v-for="item in patList" :key="item">
+                <div>
+                    <p>
+                        <span style="margin-right: 10px">姓名:</span>
+                        <span>{{item.real_name}}</span>
+                    </p>
+                    <p>
+                        <span style="margin-right: 10px">身份证:</span>
+                        <span>{{item.id_no}}</span></p>
+                </div>
+                <!-- <i>图标</i> -->
+            </li>
+        </ul>
+        <van-button type="info" size="large" @click="showPopup">新增就诊卡</van-button>
+        <van-popup v-model="show" position="bottom">
+            <van-panel type="flex">
+                <van-field v-model="patInfo.real_name" label="姓名" placeholder=请输入姓名 />
+                <van-field v-model="patInfo.id_no" label="身份证" placeholder=请输入身份证 />    
+               
+                 
+                <van-button type="info" @click="patAdd" size="large">保存</van-button>
+                 
+            </van-panel>
+          
+        </van-popup>
+        <ul class="card-list">
+            <li v-for="item in 3" :key="item">
+                <div>我是药品标题哦</div>
+                <div class="content">
+                    <div style="color: #999;font-size: 14px">
+                        <div>补充多种东西</div>
+                        <div>73.6g (0.92g*80片)</div>
+                    </div>
+                    <p style="color: red">&yen;99</p>
+                </div>
+                <div style="margin-top: 5px">
+                    <div class="tag">
+                        <span>直购</span>
+                        <span>满减</span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        </div>
         <!-- <div class="balance">
             <div>
                 <div class="wallet-icon flex-center">
@@ -44,25 +92,12 @@
             </div>
             <van-button color="#039DFF" round size="small">账户充值</van-button>
         </div> -->
-        <ul class="list">
-            <template v-for="(item, index) in middleList">
-                <li :key="index">
-                    <div style="display: flex;align-items: center">
-                        <i class="iconfont"
-                           :class="item.icon"
-                           :style="{color: item.color}"
-                           style="font-size: 24px;margin-right: 5px"></i>
-                        <span>{{item.title}}</span>
-                    </div>
-                    <van-icon name="arrow"/>
-                </li>
-                <van-divider :key="index" v-if="index + 1 !== middleList.length"></van-divider>
-            </template>
-        </ul>
+  
     </div>
 </template>
 
 <script>
+import {patAdd,patList} from '../../api/api'
     export default {
         name: 'index',
         data() {
@@ -79,9 +114,40 @@
                     {title: '我的就诊卡', icon: 'icon-order-manager', color: '#1BCC3B'},
                      {title: '住院缴费', icon: 'icon-order-manager', color: '#1BCC3B'},
                     {title: '我的医生', icon: 'icon-menzhenfuwukaobei', color: '#F62774'},
-                ]
+                ],
+                 show: false, 
+                 patList:[],
+                 patInfo:{real_name:'',id_no:'',openid:'1321313'}
+              
             }
-        }
+        },
+        mounted:function(){
+            this.getPatList();
+        },
+        methods: {
+         showPopup:function(){
+             this.show = true;
+             this.patInfo.real_name='';
+             this.patInfo.id_no = '';
+         },
+         getPatList:function(){
+               let params ={"openid":"1321313"}
+               patList(params).then(res=>{
+                   this.patList = res.data.data;
+               })
+        },
+        onClickLeft:function(){
+
+        },
+        patAdd:function(){ 
+            patAdd(this.patInfo).then(res=>{
+                if(res.data.reccnt=='success'){
+                     this.show = false;
+                     this.getPatList();
+                }
+            })
+        }  
+       } 
     }
 </script>
 
@@ -160,13 +226,45 @@
             }
         }
     }
+ul {
+        margin: 0 !important;
+    }
+
+    li {
+        background: #fff;
+    }
+
+    .card-list li {
+        margin-top: 10px;
+        padding: 20px;
+        list-style: none;
+        background: #fff;
+    }
+
+    .card-list li .content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center
+    }
+
+    .card-list li .tag span {
+        border: 1px solid red;
+        border-radius: 5px;
+        padding: 3px;
+        color: red;
+        font-size: 15px;
+        margin-right: 5px;
+    }
+
     .list {
         margin-top: 10px;
-        background: #fff;
-        li {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 10px;
-        }
+    }
+
+    .list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        margin-bottom: 10px;
     }
 </style>
