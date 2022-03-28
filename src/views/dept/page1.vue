@@ -1,9 +1,9 @@
 <template>
   <div>
     <van-nav-bar
-            title="标题"
+            title="号源信息"
             left-text=""
-            right-text="2019-06-24"
+            :right-text="query_date"
             left-arrow
             @click-left="onClickLeft"
     />
@@ -12,23 +12,24 @@
       <div class="item" style="border-bottom: 4px solid #F1F1F1">
         <div style="display: flex">
           <div style="width: 50px;text-align: center">
-            <van-image round width="50px" height="50px" src="https://img.yzcdn.cn/vant/cat.jpeg" ></van-image>
+            <van-image round width="50px" height="50px" src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2461895673,3966340434&fm=26&gp=0.jpg" ></van-image>
             <van-tag round type="warning" style="padding: 0 8px;background: #E8AB3F;margin-top: 7px">名医</van-tag>
           </div>
           <div class="msg">
             <div class="name">
-              <span style="font-weight: bold;margin-right: 5px" v-if="doctor.doctor_name">{{doctor.doctor_name}}</span>
-              <span class="position">{{doctor.doctor_title}}</span>
+              <span style="font-weight: bold;margin-right: 5px" v-if="doctorObjectStore.doctor_name">{{doctorObjectStore.doctor_name}}</span>
+              <span class="position">{{doctorObjectStore.doctor_title}}</span>
               <div class="num">
-                <van-tag round type="primary" plain >余号:{{doctor.num}}</van-tag>
-                <van-tag round type="primary">¥{{doctor.cost}}</van-tag>
+               <van-tag round type="primary" plain >余号:{{doctorObjectStore.num}}</van-tag>
+                    <!-- 
+                <van-tag round type="primary">¥{{$floatFormatter.float_format(doctorObjectStore.cost)}}</van-tag> -->
               </div>
             </div>
             <div class="expand">
               <div class="txt1">
-                <span>{{doctor.hospital_name}}</span>
+                <!-- <span>{{doctor.hospital_name}}</span> -->
                 <!-- <span>三级甲等</span> -->
-                <span>{{doctor.dept_name}}</span>
+                <span>{{doctorObjectStore.dept_name}}</span>
               </div>
               <div class="stars">
                 <van-icon name="star" />
@@ -45,7 +46,7 @@
         <div class="introduce">
           <div style="width: 70px;text-align: right">【介绍】</div>
           <div class="txt">
-          {{doctor.doctor_introduction}}
+          {{doctorObjectStore.doctor_introduction}}
           </div>
         </div>
       </div>
@@ -53,13 +54,13 @@
 
     <div class="rregister_list" style="height: calc(100vh - 146px - 46px);overflow: auto">
       <van-list v-model="loading" :finished="finished" finished-text="没有更多了">
-        <van-tabs v-model="active">
+        <!-- <van-tabs v-model="active">
           <van-tab title="标签 1"></van-tab>
           <van-tab title="标签 2"></van-tab>
-        </van-tabs>
+        </van-tabs> -->
         <div  v-for="(item,index) in detailList" :key="index" class="item">
           <div class="div1">
-            <van-tag round type="primary">专家门诊</van-tag>
+            <van-tag round type="primary">{{doctorObjectStore.doctor_title}}</van-tag>
             <div style="margin-top: 3px">{{item.resource_date}}</div>
           </div>
           <div class="div2">
@@ -67,16 +68,17 @@
             <div style="margin-top: 3px">时间</div>
           </div>
           <div class="div2">
-            <div class="txt">{{item.serial}}号</div>
+            <div class="txt">{{index+1}}号</div>
             <div style="margin-top: 3px">票号</div>
           </div>
-          <div class="div2">
-            <div class="txt">￥{{item.cost}}</div>
+          <!-- <div class="div2">
+            <div class="txt">￥{{$floatFormatter.float_format(doctorObjectStore.cost)}}</div>
             <div style="margin-top: 3px">费用</div>
-          </div>
+          </div> -->
           <div class="div3">
-            <van-button round type="info" size="small" v-if="!item.is_used">预约</van-button>
-            <van-button round size="small" v-else style="background: #B2B2B2;color: #fff" >已预约</van-button>
+            <van-button round type="info" size="small" v-if="today==query_date" @click="register(item)">挂号</van-button>
+              <van-button round type="info" size="small" v-if="today!=query_date" @click="register(item)">预约</van-button>
+            <!-- <van-button round size="small" v-else style="background: #B2B2B2;color: #fff" >已预约</van-button> -->
           </div>
         </div>
       </van-list>
@@ -87,6 +89,7 @@
 <script>
    
   import {mobileResDetail} from '../../api/api'
+import { mapGetters } from "vuex";
   export default {
     data() {
       return {
@@ -94,26 +97,42 @@
         list: [],
         doctor:{},
         detailList:[],
+        query_date:'',
+        today:'',
         loading: false,
         finished: false,
+        show:false
       };
+    },
+    computed: {
+    ...mapGetters(["doctorObjectStore"]),
     },
     methods: {
       onClickLeft() {
          this.$router.back(-1)
       },
-      getResDetailVo(id){
-        let params = {"doc_res_id":id}
+      getResDetailVo(){
+        let params = {dept_code:this.doctorObjectStore.dept_code,doctor_code:this.doctorObjectStore.doctor_code,date_str:this.query_date}
          mobileResDetail(params).then(res=>{ 
-           this.doctor = res.data.data.docResVo;
-           this.detailList  = res.data.data.resList
+           this.doctor = res.data.data.doc_res_vo;
+           this.detailList  = res.data.data.res_list
            this.loading = true;
            this.finished = true;
          })
       },
+      register(item){
+       
+           let doctor_resource_id = item.id;
+           let temp = Object.assign(item,this.doctorObjectStore)
+           temp.doctor_resource_id =doctor_resource_id;
+           this.$store.dispatch("setDocres", temp);
+           this.$router.push({path:'/register-confirm'});
+      }
     },
-    mounted(){
-      let id =  this.$route.params.id;
+    mounted(){ 
+      let id =  this.$route.params.id; 
+      this.query_date = this.$route.params.date_str;
+      this.today = this.$dateFormatter.format(new Date(),'yyyy-MM-dd')
       this.getResDetailVo(id);
     }
   }
@@ -216,7 +235,7 @@
       padding: 15px;
       border-bottom: 1px solid #f8f8f8;
       .div1{
-        flex: 1;
+      
         font-size: 12px;
       }
       .div2{

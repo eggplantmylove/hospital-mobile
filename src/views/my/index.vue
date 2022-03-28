@@ -22,7 +22,7 @@
                 </div> -->
                 <ul class="top-list">
                     <template v-for="(item, index) in topList">
-                        <li :key="index">
+                        <li :key="index" @click="routerPath(item.path)">
                             <div class="flex-center">
                                 <i class="iconfont" :class="item.icon"></i>
                             </div>
@@ -45,8 +45,8 @@
             <van-button color="#039DFF" round size="small">账户充值</van-button>
         </div> -->
         <ul class="list">
-            <template v-for="(item, index) in middleList">
-                <li :key="index">
+            <template v-for="(item, index) in middleList"> 
+                <li :key="index" @click="routerPath(item.path)"  > 
                     <div style="display: flex;align-items: center">
                         <i class="iconfont"
                            :class="item.icon"
@@ -54,9 +54,11 @@
                            style="font-size: 24px;margin-right: 5px"></i>
                         <span>{{item.title}}</span>
                     </div>
-                    <van-icon name="arrow"/>
+                    <van-icon name="arrow"/> 
                 </li>
-                <van-divider :key="index" v-if="index + 1 !== middleList.length"></van-divider>
+                <van-divider :key="index" v-if="index + 1 !== middleList.length">
+
+                </van-divider>
             </template>
         </ul>
     </div>
@@ -68,19 +70,24 @@
         data() {
             return {
                 topList: [
-                    {title: '预约记录', icon: 'icon-jilu'},
-                    {title: '挂号记录', icon: 'icon-jilu1'},
-                    {title: '缴费明细', icon: 'icon-zizhujiaofei'},
-                    {title: '报告单', icon: 'icon-zhuyuanbaogao'},
+                    {title: '预约记录', icon: 'icon-yuyuejilu',path:'appointment-list'},
+                    {title: '挂号记录', icon: 'icon-guahaojilu',path:'register-list'},
+                    {title: '缴费明细', icon: 'icon-mingxi2'},
+                    {title: '报告单', icon: 'icon-report-fill'},
                 ],
                 middleList: [
-                    {title: '订单中心', icon: 'icon-jilu', color: '#3694D8'},
+                    {title: '订单中心', icon: 'icon-order1', color: '#3694D8',path:"/order-list"},
                     // {title: '个人信息', icon: 'icon-aixin', color: '#FA3232'},
-                    {title: '我的就诊卡', icon: 'icon-order-manager', color: '#1BCC3B'},
-                     {title: '住院缴费', icon: 'icon-order-manager', color: '#1BCC3B'},
-                    {title: '我的医生', icon: 'icon-menzhenfuwukaobei', color: '#F62774'},
+                    {title: '我的就诊卡', icon: 'icon-jiuzhenqia', color: '#1BCC3B',path:"/card-list"},
+                     {title: '住院缴费', icon: 'icon-zhuyuan', color: '#1BCC3B'},
+                    // {title: '我的医生', icon: 'icon-menzhenfuwukaobei', color: '#F62774'},
                 ]
             }
+        },
+        methods:{
+           routerPath:function(path){
+              this.$router.push({path:path})
+           }, 
         }
     }
 </script>

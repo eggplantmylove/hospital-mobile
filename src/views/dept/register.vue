@@ -1,14 +1,7 @@
 <template>
-  
   <div>
-      <van-overlay :show="show"  />
-    <van-nav-bar  left-arrow @click-left="onClickLeft">
-      <template #title>
-        <div class="btns">
-          <span class="active">按日期</span>
-          <span style="margin-left: -1px">按医生</span>
-        </div>
-      </template>
+    <van-nav-bar  title="当天挂号" left-arrow @click-left="onClickLeft">
+      
       <template #right>
         <van-icon name="chat-o" size="18" />
       </template>
@@ -16,10 +9,10 @@
 
     <div class="dates">
       <div class="txt1">
-        <p style="font-weight: bold">门诊预约</p>
+        <p style="font-weight: bold">当天挂号</p>
         <p style="float: right">{{today}}</p>
       </div>
-      <div class="list">
+      <!-- <div class="list">
        
         <div class="item" v-for="(item,index)  in dateList" :key="index" :class="{'active':currentSort==index}" @click="active(index,item.date_str)">
           <div style="padding: 5px 0">{{item.week}}</div>
@@ -29,7 +22,7 @@
           </div>
         </div>
        
-      </div>
+      </div> -->
     </div>
 
     <div class="rregister_list" style="height: calc(100vh - 137px - 46px);overflow: auto">
@@ -46,8 +39,8 @@
                   <span style="font-weight: bold;margin-right: 5px">{{item.doctor_name}}</span>
                   <span class="position">({{item.doctor_title}})</span>
                   <div class="num">
-                    <van-tag round type="primary" plain >余号:{{item.num}}</van-tag>
-                    <!-- <van-tag round type="primary">￥{{$floatFormatter.float_format(item.cost)}}</van-tag> -->
+                    <!-- <van-tag round type="primary" plain v-if="item.num!=null" >余号:{{item.num}}</van-tag> -->
+                    <!-- <van-tag round type="primary" v-if="item.num!=null">￥{{$floatFormatter.float_format(item.cost)}}</van-tag> -->
                   </div>
                 </div>
                 <div class="expand">
@@ -55,7 +48,9 @@
                     <span> {{item.hospital_name}}</span>
                     <!-- <span>三级甲等</span>-->
                     <span>{{item.dept_name}}</span> 
+                  
                   </div>
+               
                   <div class="stars">
                     <van-icon name="star" />
                     <van-icon name="star" />
@@ -67,13 +62,17 @@
                   </div>
                 </div>
               </div>
+                    <!-- <div style="width: 50px;">
+                           <van-button round type="info" size="small" >挂号</van-button>
+             </div> -->
             </div>
-            <div class="introduce">
+            <!-- <div class="introduce">
               <div style="width: 70px;text-align: right">【介绍】</div>
               <div class="txt">
                 {{item.doctor_introduction}}
               </div>
-            </div>
+            </div> -->
+          
           </div>
         </div>
       </van-list>
@@ -83,8 +82,8 @@
 
 <script>
   import { Toast } from 'vant';
-  import {mobileOutpatientDoctor} from '../../api/api';
-  import {store} from '../../store/index'
+  import {mobileRegisterDoc} from '../../api/api';
+  import {mapGetters} from 'vuex';
   export default {
     data() {
       return {
@@ -97,46 +96,46 @@
         param:{},
         loading: false,
         finished: false,
-        show:false
       };
+    },
+    computed:{
+        ...mapGetters(['resObjectStore'])
     },
     methods: {
       active(index,date_str) {
        this.currentSort  =  index;
        this.today = date_str;
-       this.show = true;
        let param = {"date_str":date_str,"dept_id":this.dept_id}
-        mobileOutpatientDoctor(param).then(res=>{ 
+        mobileRegisterDoc(param).then(res=>{ 
          this.doctorList = res.data.data.doc_res_vo;
          this.dateList = res.data.data.date_list;
          this.loading = true;
          this.finished = true;
-         this.show = false;
         })
       },
       onClickLeft() {
-        this.$router.back(-1)
+         this.$router.back(-1)
       },
       listClick(item){
        this.$store.dispatch("setDoctorObject", item); 
-       this.$router.push({path:'/detail-resource/'+item.doctor_code+'/'+this.today});
+      //  this.$router.push({path:`/register-confirm`})
+         let date_str = this.$dateFormatter.format(new Date(),'yyyy-MM-dd');
+         this.$router.push({path:'/detail-resource/'+item.doctor_code+'/'+date_str});
       },
 
-      getDoctorList(){
+       async getDoctorList(){
         let param={"dept_id":this.dept_id}
-        mobileOutpatientDoctor(param).then(res=>{ 
-          if(res.data.reccnt=='success'){
-              this.doctorList = res.data.data.doc_res_vo;
-              this.dateList = res.data.data.date_list;
-              this.today = this.dateList[0].date_str;
-          }  
+        await mobileRegisterDoc(param).then(res=>{ 
+         this.doctorList = res.data.data.doc_res_vo;
+         this.dateList = res.data.data.date_list; 
+        //  this.today = this.dateList[0].date_str;
          this.loading = true;
          this.finished = true;
         })
       },
 
     },
-    mounted(){
+    mounted(){ 
       this.dept_id =  this.$route.params.id;
       this.getDoctorList();
     }
@@ -270,6 +269,10 @@
             }
           }
         }
+      }
+      .div3{
+        flex: 1;
+        text-align: center;
       }
 
       .introduce{
